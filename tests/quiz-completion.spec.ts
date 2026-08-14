@@ -50,6 +50,7 @@ test.describe('@live-side-effects registration quiz — business outcome', () =>
           type: 'quiz-step',
           description: `#${step.index} [${step.strategy}] ${step.url}`,
         }),
+      onWarning: (message) => test.info().annotations.push({ type: 'quiz-warning', description: message }),
     });
 
     const signal = await completionSignal;
