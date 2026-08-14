@@ -1,0 +1,34 @@
+name: Quiz business-outcome smoke
+
+# Scheduled synthetic monitor, not a per-PR gate — see README "CI/CD" for why.
+# workflow_dispatch is kept for on-demand runs (e.g. right after a known quiz
+# deploy/experiment change, triggered manually or from another pipeline).
+on:
+  schedule:
+    - cron: '*/30 * * * *'
+  workflow_dispatch: {}
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npx playwright test
+        env:
+          QUIZ_BASE_URL: ${{ secrets.QUIZ_STAGE_BASE_URL }}
+          QUIZ_START_URL: ${{ secrets.QUIZ_STAGE_START_URL }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 14
+      # TODO once alerting channel is confirmed with the team: notify
+      # Slack/PagerDuty on failure — this funnel maps directly to paid
+      # traffic, so a broken quiz should page someone, not just fail quietly.
