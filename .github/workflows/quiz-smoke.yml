@@ -4,8 +4,8 @@ name: Quiz business-outcome smoke
 # workflow_dispatch is kept for on-demand runs (e.g. right after a known quiz
 # deploy/experiment change, triggered manually or from another pipeline).
 on:
-  schedule:
-    - cron: '*/30 * * * *'
+  # schedule:
+  #   - cron: '*/30 * * * *'
   workflow_dispatch: {}
 
 jobs:
